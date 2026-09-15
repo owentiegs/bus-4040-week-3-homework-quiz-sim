@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUS 4040 Quiz Simulator</title>
+<style>
+  :root {
+    --blue: #2b5c8a;
+    --blue-dark: #1c3f5f;
+    --green: #2e7d4f;
+    --red: #b23b3b;
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --border: #d8dee4;
+    --text: #222831;
+    --muted: #5a6672;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 16px;
+    font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 640px;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 4px 0;
+    color: var(--blue-dark);
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #e4e9ed;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--blue);
+    transition: width 0.2s ease;
+  }
+  .week-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--blue-dark);
+    background: #e6eef5;
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 12px;
+  }
+  .question-text {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin: 0 0 16px 0;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-btn {
+    text-align: left;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.98rem;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: #f5f9fc;
+  }
+  .option-btn:disabled {
+    cursor: default;
+  }
+  .option-btn.correct {
+    background: #e7f5ec;
+    border-color: var(--green);
+    color: #1e5a37;
+  }
+  .option-btn.incorrect {
+    background: #fbeaea;
+    border-color: var(--red);
+    color: #7a2727;
+  }
+  .feedback {
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .feedback.right {
+    background: #e7f5ec;
+    border: 1px solid var(--green);
+  }
+  .feedback.wrong {
+    background: #fbeaea;
+    border: 1px solid var(--red);
+  }
+  .feedback strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+  .next-btn, .primary-btn {
+    margin-top: 16px;
+    padding: 11px 18px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    cursor: pointer;
+  }
+  .next-btn:hover, .primary-btn:hover {
+    background: var(--blue-dark);
+  }
+  .secondary-btn {
+    margin-top: 16px;
+    margin-left: 10px;
+    padding: 11px 18px;
+    background: #fff;
+    color: var(--blue-dark);
+    border: 1px solid var(--blue);
+    border-radius: 8px;
+    font-size: 0.98rem;
+    cursor: pointer;
+  }
+  .secondary-btn:hover {
+    background: #f0f6fb;
+  }
+  .score-big {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin: 4px 0 2px 0;
+  }
+  .score-sub {
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .missed-list {
+    margin: 14px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .missed-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+  }
+  .missed-list li:last-child { border-bottom: none; }
+  .missed-week {
+    font-weight: 600;
+    color: var(--blue-dark);
+    margin-right: 6px;
+  }
+  .btn-row {
+    margin-top: 8px;
+  }
+  .start-note {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>BUS 4040 Quiz Simulator</h1>
+  <div class="subtitle">Practice questions from the Week 1-3 course material</div>
+  <div class="card" id="app"></div>
+</div>
+
+<script>
+(function () {
+
+  // ---- Question bank (20 questions, drawn from the Week 1-3 course files) ----
+  var QUESTIONS = [
+    {
+      id: 1, week: "Week 1", type: "mc",
+      question: "What is BUS 4040 officially about?",
+      options: ["AI for Business Applications", "Introduction to Programming", "Data Structures", "Business Statistics"],
+      correct: 0,
+      explain: "The course title on Slide 1 is \"BUS 4040 - AI for Business Applications.\""
+    },
+    {
+      id: 2, week: "Week 1", type: "mc",
+      question: "Who teaches this course?",
+      options: ["Ryan Carlyle", "Linus Torvalds", "Geoffrey Litt", "It isn't stated"],
+      correct: 0,
+      explain: "Slide 5 says: \"My name is Ryan Carlyle. Please call me Ryan or Carlyle.\""
+    },
+    {
+      id: 3, week: "Week 1", type: "tf",
+      question: "This course will teach you to program.",
+      correct: false,
+      explain: "Slide 3 says: \"You will not learn to program in this class... AI does the building.\""
+    },
+    {
+      id: 4, week: "Week 1", type: "mc",
+      question: "How many credit hours is BUS 4040?",
+      options: ["1", "3", "4", "16"],
+      correct: 0,
+      explain: "Slide 3 says: \"One credit, sixteen weeks.\""
+    },
+    {
+      id: 5, week: "Week 1", type: "tf",
+      question: "The instructor says nothing on the final exam will be a trick question.",
+      correct: true,
+      explain: "Slide 3 says: \"Nothing on the final is a trick, and every question on it gets discussed in class.\""
+    },
+    {
+      id: 6, week: "Week 1", type: "tf",
+      question: "If you already have a GitHub account, the homework tells you to create a brand new second account for this class.",
+      correct: false,
+      explain: "The Week 1 homework says: \"If you already have a GitHub account, do not create a second one.\" Just add your U of I email to it."
+    },
+    {
+      id: 7, week: "Week 1", type: "mc",
+      question: "What does the Week 1 homework ask you to do with the GitHub videos?",
+      options: [
+        "Just watch them, don't install anything",
+        "Install Git and create a test repo",
+        "Skip them, they're optional",
+        "Fork a repo and submit a pull request"
+      ],
+      correct: 0,
+      explain: "The homework says: \"You don't need to install anything. Just watch some videos... Please don't install software.\""
+    },
+    {
+      id: 8, week: "Week 2", type: "mc",
+      question: "Who created Git, and in what year?",
+      options: ["Linus Torvalds, in 2005", "Bill Gates, in 1995", "Guido van Rossum, in 2005", "Linus Torvalds, in 1991"],
+      correct: 0,
+      explain: "Week 2 narrative: \"In 2005, Linus Torvalds created Git for Linux kernel development.\""
+    },
+    {
+      id: 9, week: "Week 2", type: "mc",
+      question: "Why did Linus Torvalds create Git?",
+      options: [
+        "The Linux kernel project lost access to its proprietary version control tool",
+        "He wanted to start a company",
+        "GitHub asked him to build it",
+        "It was a class project"
+      ],
+      correct: 0,
+      explain: "Week 2 narrative: Git was created \"for Linux kernel development after the project lost access to its proprietary tool.\""
+    },
+    {
+      id: 10, week: "Week 2", type: "tf",
+      question: "Git requires everyone to depend on one central server to commit, branch, or view history.",
+      correct: false,
+      explain: "That describes the older centralized systems Git replaced. With Git, \"every developer holds a full copy of the entire history. There's no single bottleneck or single point of failure.\""
+    },
+    {
+      id: 11, week: "Week 2", type: "mc",
+      question: "Which command creates and switches to a new branch?",
+      options: ["git checkout -b branch-name", "git add -A", "git commit -m \"message\"", "git push -u origin branch-name"],
+      correct: 0,
+      explain: "Week 2 narrative step 1 for the hotel page example: \"git checkout -b add-hotel-landing-page\"."
+    },
+    {
+      id: 12, week: "Week 2", type: "mc",
+      question: "Which authentication method does the course recommend for connecting to GitHub in this class?",
+      options: ["HTTPS", "SSH keys, required", "FTP", "Telnet"],
+      correct: 0,
+      explain: "week-2-connecting-to-github.md says: \"For this class, HTTPS is fine.\""
+    },
+    {
+      id: 13, week: "Week 2", type: "tf",
+      question: "The course materials say it's fine to commit your changes directly onto the main branch.",
+      correct: false,
+      explain: "Week 2 narrative says to create a new branch (\"avoid committing to the main branch\"), since a branch keeps changes off main and mirrors a real-world PR workflow."
+    },
+    {
+      id: 14, week: "Week 2", type: "mc",
+      question: "When creating a new GitHub repo, what does checking \"Add a README file\" do?",
+      options: [
+        "Creates the initial commit and maps the repo to the main branch",
+        "Deletes the repo",
+        "Makes the repo private",
+        "Nothing, it's just decoration"
+      ],
+      correct: 0,
+      explain: "Week 2 narrative: \"This is important because creating the README creates an initial commit that maps the repo to the main branch.\""
+    },
+    {
+      id: 15, week: "Week 3", type: "mc",
+      question: "Put Claude's four model tiers in order from largest/most capable to smallest.",
+      options: [
+        "Fable, Opus, Sonnet, Haiku",
+        "Haiku, Sonnet, Opus, Fable",
+        "Sonnet, Fable, Haiku, Opus",
+        "Opus, Fable, Sonnet, Haiku"
+      ],
+      correct: 0,
+      explain: "Week 3 narrative: \"Four model tiers, largest to smallest: Fable, Opus, Sonnet, Haiku.\""
+    },
+    {
+      id: 16, week: "Week 3", type: "mc",
+      question: "Which Claude tier is described as \"the cost effective everyday workhorse\"?",
+      options: ["Sonnet", "Fable", "Opus", "Haiku"],
+      correct: 0,
+      explain: "Week 3 narrative: \"Sonnet is the cost effective everyday workhorse.\""
+    },
+    {
+      id: 17, week: "Week 3", type: "tf",
+      question: "A \"token\" and a \"parameter\" mean the same thing in AI.",
+      correct: false,
+      explain: "They're different. Parameters are the numbers inside a model that get tuned during training. Tokens are chunks of text, roughly 3/4 of an English word."
+    },
+    {
+      id: 18, week: "Week 3", type: "mc",
+      question: "What is a \"harness,\" as described in Week 3?",
+      options: [
+        "The program you use to interact with an AI model",
+        "The AI model itself",
+        "A type of computer chip",
+        "A GitHub branch"
+      ],
+      correct: 0,
+      explain: "Week 3 narrative: \"A harness is the program you use to interact with an AI model. The model is the AI behind the harness... The harness is the music player, the model is the music.\""
+    },
+    {
+      id: 19, week: "Week 3", type: "tf",
+      question: "MindRouter can be reached from anywhere, with no VPN needed.",
+      correct: false,
+      explain: "The setup guide says: \"MindRouter is only reachable from the campus network. If you are off campus, start the U of I VPN.\""
+    },
+    {
+      id: 20, week: "Week 3", type: "mc",
+      question: "According to Week 3, how should you pick which AI model to use for a job?",
+      options: [
+        "By result, speed, and price, not by parameter count",
+        "Always pick the biggest model",
+        "Always pick the cheapest model, regardless of quality",
+        "By whichever model has the most parameters"
+      ],
+      correct: 0,
+      explain: "Week 3 narrative: \"You do not pick models by parameter count, you pick by result, speed, and price.\""
+    }
+  ];
+
+  // ---- State ----
+  var app = document.getElementById("app");
+  var currentSet = [];
+  var index = 0;
+  var score = 0;
+  var missedIds = [];
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+
+  function startQuiz(questionList) {
+    currentSet = shuffle(questionList);
+    index = 0;
+    score = 0;
+    missedIds = [];
+    renderQuestion();
+  }
+
+  function getOptionsForQuestion(q) {
+    if (q.type === "tf") {
+      return ["True", "False"];
+    }
+    return q.options;
+  }
+
+  function isChoiceCorrect(q, choiceIndex) {
+    if (q.type === "tf") {
+      var chosenBool = (choiceIndex === 0); // 0 = "True", 1 = "False"
+      return chosenBool === q.correct;
+    }
+    return choiceIndex === q.correct;
+  }
+
+  function renderQuestion() {
+    var q = currentSet[index];
+    var total = currentSet.length;
+    var options = getOptionsForQuestion(q);
+
+    var html = "";
+    html += '<div class="progress-row"><span>Question ' + (index + 1) + ' of ' + total + '</span><span>Score so far: ' + score + '</span></div>';
+    html += '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.round((index / total) * 100) + '%"></div></div>';
+    html += '<div class="week-tag">' + q.week + '</div>';
+    html += '<p class="question-text">' + q.question + '</p>';
+    html += '<div class="options" id="options"></div>';
+    html += '<div id="feedbackArea"></div>';
+
+    app.innerHTML = html;
+
+    var optionsDiv = document.getElementById("options");
+    options.forEach(function (optText, i) {
+      var btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.type = "button";
+      btn.textContent = optText;
+      btn.addEventListener("click", function () {
+        handleAnswer(q, i, optionsDiv);
+      });
+      optionsDiv.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(q, choiceIndex, optionsDiv) {
+    var buttons = optionsDiv.querySelectorAll(".option-btn");
+    var correctIndex = q.type === "tf" ? (q.correct ? 0 : 1) : q.correct;
+    var wasRight = isChoiceCorrect(q, choiceIndex);
+
+    buttons.forEach(function (btn, i) {
+      btn.disabled = true;
+      if (i === correctIndex) {
+        btn.classList.add("correct");
+      } else if (i === choiceIndex && !wasRight) {
+        btn.classList.add("incorrect");
+      }
+    });
+
+    if (wasRight) {
+      score++;
+    } else {
+      missedIds.push(q.id);
+    }
+
+    var feedbackArea = document.getElementById("feedbackArea");
+    var feedbackHtml = '<div class="feedback ' + (wasRight ? "right" : "wrong") + '">';
+    feedbackHtml += '<strong>' + (wasRight ? "Correct." : "Not quite.") + '</strong>';
+    feedbackHtml += q.explain;
+    feedbackHtml += '</div>';
+    feedbackHtml += '<button class="next-btn" id="nextBtn">' + (index === currentSet.length - 1 ? "See my results" : "Next question") + '</button>';
+    feedbackArea.innerHTML = feedbackHtml;
+
+    document.getElementById("nextBtn").addEventListener("click", function () {
+      index++;
+      if (index < currentSet.length) {
+        renderQuestion();
+      } else {
+        renderResults();
+      }
+    });
+  }
+
+  function renderResults() {
+    var total = currentSet.length;
+    var html = "";
+    html += '<div class="score-big">' + score + ' / ' + total + '</div>';
+
+    if (missedIds.length === 0) {
+      html += '<div class="score-sub">You got every question right. Nice work.</div>';
+      html += '<button class="primary-btn" id="restartBtn">Start a new full quiz (20 questions)</button>';
+    } else {
+      html += '<div class="score-sub">You missed ' + missedIds.length + ' question' + (missedIds.length === 1 ? "" : "s") + '. Here is what to review:</div>';
+      html += '<ul class="missed-list">';
+      missedIds.forEach(function (id) {
+        var q = QUESTIONS.filter(function (item) { return item.id === id; })[0];
+        html += '<li><span class="missed-week">' + q.week + '</span>' + q.question + '</li>';
+      });
+      html += '</ul>';
+      html += '<div class="btn-row">';
+      html += '<button class="primary-btn" id="retryBtn">Retry just the ones I missed</button>';
+      html += '<button class="secondary-btn" id="restartBtn">Start a new full quiz (20 questions)</button>';
+      html += '</div>';
+    }
+
+    app.innerHTML = html;
+
+    var restartBtn = document.getElementById("restartBtn");
+    if (restartBtn) {
+      restartBtn.addEventListener("click", function () {
+        startQuiz(QUESTIONS);
+      });
+    }
+    var retryBtn = document.getElementById("retryBtn");
+    if (retryBtn) {
+      retryBtn.addEventListener("click", function () {
+        var missedQuestions = QUESTIONS.filter(function (q) {
+          return missedIds.indexOf(q.id) !== -1;
+        });
+        startQuiz(missedQuestions);
+      });
+    }
+  }
+
+  function renderStart() {
+    var html = "";
+    html += '<p class="start-note">20 questions covering Weeks 1-3: course setup and grading, Git and GitHub basics, and AI models and tools. Questions are shuffled every time you start. You will find out right away whether you got each one right, with a short explanation and which week it comes from. At the end you can retry just the questions you missed.</p>';
+    html += '<button class="primary-btn" id="startBtn">Start the quiz</button>';
+    app.innerHTML = html;
+    document.getElementById("startBtn").addEventListener("click", function () {
+      startQuiz(QUESTIONS);
+    });
+  }
+
+  renderStart();
+})();
+</script>
+</body>
+</html>
