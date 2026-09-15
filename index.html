@@ -28,7 +28,7 @@
   }
   .wrap {
     width: 100%;
-    max-width: 640px;
+    max-width: 760px;
   }
   h1 {
     font-size: 1.4rem;
@@ -38,7 +38,25 @@
   .subtitle {
     color: var(--muted);
     font-size: 0.9rem;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+  }
+  .timer-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .timer-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .timer-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--blue-dark);
+    font-variant-numeric: tabular-nums;
   }
   .card {
     background: var(--card);
@@ -46,26 +64,6 @@
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  .progress-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-  .progress-bar {
-    height: 6px;
-    background: #e4e9ed;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 18px;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--blue);
-    transition: width 0.2s ease;
   }
   .week-tag {
     display: inline-block;
@@ -75,65 +73,138 @@
     background: #e6eef5;
     border-radius: 999px;
     padding: 3px 10px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
-  .question-text {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    margin: 0 0 16px 0;
+  .round-heading {
+    font-size: 1.05rem;
+    margin: 0 0 4px 0;
   }
-  .options {
+  .round-progress {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .instructions {
+    font-size: 0.92rem;
+    color: var(--muted);
+    margin: 0 0 8px 0;
+    line-height: 1.45;
+  }
+  .feedback-banner {
+    margin: 0 0 12px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease;
+  }
+  .feedback-banner.show {
+    opacity: 1;
+    max-height: 60px;
+  }
+  .feedback-banner.right {
+    background: #e7f5ec;
+    border: 1px solid var(--green);
+  }
+  .feedback-banner.wrong {
+    background: #fbeaea;
+    border: 1px solid var(--red);
+  }
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 560px) {
+    .match-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .col-heading {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .term-list, .def-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-height: 20px;
   }
-  .option-btn {
-    text-align: left;
+  .term-card {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: #fff;
-    font-size: 0.98rem;
-    cursor: pointer;
+    font-size: 0.95rem;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .term-card.dragging {
+    position: fixed;
+    z-index: 1000;
+    opacity: 0.9;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    pointer-events: none;
+    cursor: grabbing;
+  }
+  .term-placeholder {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+  }
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: #fafcfe;
+  }
+  .drop-zone .def-text {
+    font-size: 0.9rem;
+    margin: 0 0 8px 0;
     color: var(--text);
+    line-height: 1.35;
   }
-  .option-btn:hover:not(:disabled) {
+  .drop-zone .slot {
+    min-height: 34px;
+    border-radius: 6px;
+    border: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 0.83rem;
+    color: var(--muted);
+    background: #fff;
+    text-align: center;
+  }
+  .drop-zone.drag-hover {
     border-color: var(--blue);
-    background: #f5f9fc;
+    background: #eef5fb;
   }
-  .option-btn:disabled {
-    cursor: default;
+  .drop-zone.filled {
+    border-style: solid;
+    border-color: var(--green);
+    background: #f1faf4;
   }
-  .option-btn.correct {
-    background: #e7f5ec;
+  .drop-zone.filled .slot {
+    border-style: solid;
     border-color: var(--green);
     color: #1e5a37;
-  }
-  .option-btn.incorrect {
-    background: #fbeaea;
-    border-color: var(--red);
-    color: #7a2727;
-  }
-  .feedback {
-    margin-top: 16px;
-    padding: 14px;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    line-height: 1.45;
-  }
-  .feedback.right {
+    font-weight: 600;
     background: #e7f5ec;
-    border: 1px solid var(--green);
   }
-  .feedback.wrong {
-    background: #fbeaea;
-    border: 1px solid var(--red);
+  .drop-zone.wrong-flash {
+    border-color: var(--red);
+    background: #fdecec;
   }
-  .feedback strong {
-    display: block;
-    margin-bottom: 4px;
-  }
-  .next-btn, .primary-btn {
+  .primary-btn {
     margin-top: 16px;
     padding: 11px 18px;
     background: var(--blue);
@@ -143,9 +214,7 @@
     font-size: 0.98rem;
     cursor: pointer;
   }
-  .next-btn:hover, .primary-btn:hover {
-    background: var(--blue-dark);
-  }
+  .primary-btn:hover { background: var(--blue-dark); }
   .secondary-btn {
     margin-top: 16px;
     margin-left: 10px;
@@ -157,229 +226,96 @@
     font-size: 0.98rem;
     cursor: pointer;
   }
-  .secondary-btn:hover {
-    background: #f0f6fb;
-  }
+  .secondary-btn:hover { background: #f0f6fb; }
   .score-big {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--blue-dark);
     margin: 4px 0 2px 0;
   }
   .score-sub {
     color: var(--muted);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
   .missed-list {
-    margin: 14px 0;
+    margin: 10px 0;
     padding: 0;
     list-style: none;
   }
   .missed-list li {
     padding: 10px 0;
     border-bottom: 1px solid var(--border);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
   .missed-list li:last-child { border-bottom: none; }
+  .missed-term {
+    font-weight: 700;
+    color: var(--blue-dark);
+  }
   .missed-week {
     font-weight: 600;
-    color: var(--blue-dark);
-    margin-right: 6px;
-  }
-  .btn-row {
-    margin-top: 8px;
-  }
-  .start-note {
     color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 18px;
-    line-height: 1.5;
+    font-size: 0.78rem;
+    margin-left: 6px;
   }
+  .btn-row { margin-top: 4px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>BUS 4040 Quiz Simulator</h1>
-  <div class="subtitle">Practice questions from the Week 1-3 course material</div>
+  <div class="subtitle">A drag-and-drop matching quiz on the Week 1-3 course material</div>
+  <div class="timer-row" id="timerRow" style="display:none;">
+    <span class="timer-label">Time</span>
+    <span class="timer-value" id="timerValue">00:00</span>
+  </div>
   <div class="card" id="app"></div>
 </div>
 
 <script>
 (function () {
 
-  // ---- Question bank (20 questions, drawn from the Week 1-3 course files) ----
-  var QUESTIONS = [
-    {
-      id: 1, week: "Week 1", type: "mc",
-      question: "What is BUS 4040 officially about?",
-      options: ["AI for Business Applications", "Introduction to Programming", "Data Structures", "Business Statistics"],
-      correct: 0,
-      explain: "The course title on Slide 1 is \"BUS 4040 - AI for Business Applications.\""
-    },
-    {
-      id: 2, week: "Week 1", type: "mc",
-      question: "Who teaches this course?",
-      options: ["Ryan Carlyle", "Linus Torvalds", "Geoffrey Litt", "It isn't stated"],
-      correct: 0,
-      explain: "Slide 5 says: \"My name is Ryan Carlyle. Please call me Ryan or Carlyle.\""
-    },
-    {
-      id: 3, week: "Week 1", type: "tf",
-      question: "This course will teach you to program.",
-      correct: false,
-      explain: "Slide 3 says: \"You will not learn to program in this class... AI does the building.\""
-    },
-    {
-      id: 4, week: "Week 1", type: "mc",
-      question: "How many credit hours is BUS 4040?",
-      options: ["1", "3", "4", "16"],
-      correct: 0,
-      explain: "Slide 3 says: \"One credit, sixteen weeks.\""
-    },
-    {
-      id: 5, week: "Week 1", type: "tf",
-      question: "The instructor says nothing on the final exam will be a trick question.",
-      correct: true,
-      explain: "Slide 3 says: \"Nothing on the final is a trick, and every question on it gets discussed in class.\""
-    },
-    {
-      id: 6, week: "Week 1", type: "tf",
-      question: "If you already have a GitHub account, the homework tells you to create a brand new second account for this class.",
-      correct: false,
-      explain: "The Week 1 homework says: \"If you already have a GitHub account, do not create a second one.\" Just add your U of I email to it."
-    },
-    {
-      id: 7, week: "Week 1", type: "mc",
-      question: "What does the Week 1 homework ask you to do with the GitHub videos?",
-      options: [
-        "Just watch them, don't install anything",
-        "Install Git and create a test repo",
-        "Skip them, they're optional",
-        "Fork a repo and submit a pull request"
-      ],
-      correct: 0,
-      explain: "The homework says: \"You don't need to install anything. Just watch some videos... Please don't install software.\""
-    },
-    {
-      id: 8, week: "Week 2", type: "mc",
-      question: "Who created Git, and in what year?",
-      options: ["Linus Torvalds, in 2005", "Bill Gates, in 1995", "Guido van Rossum, in 2005", "Linus Torvalds, in 1991"],
-      correct: 0,
-      explain: "Week 2 narrative: \"In 2005, Linus Torvalds created Git for Linux kernel development.\""
-    },
-    {
-      id: 9, week: "Week 2", type: "mc",
-      question: "Why did Linus Torvalds create Git?",
-      options: [
-        "The Linux kernel project lost access to its proprietary version control tool",
-        "He wanted to start a company",
-        "GitHub asked him to build it",
-        "It was a class project"
-      ],
-      correct: 0,
-      explain: "Week 2 narrative: Git was created \"for Linux kernel development after the project lost access to its proprietary tool.\""
-    },
-    {
-      id: 10, week: "Week 2", type: "tf",
-      question: "Git requires everyone to depend on one central server to commit, branch, or view history.",
-      correct: false,
-      explain: "That describes the older centralized systems Git replaced. With Git, \"every developer holds a full copy of the entire history. There's no single bottleneck or single point of failure.\""
-    },
-    {
-      id: 11, week: "Week 2", type: "mc",
-      question: "Which command creates and switches to a new branch?",
-      options: ["git checkout -b branch-name", "git add -A", "git commit -m \"message\"", "git push -u origin branch-name"],
-      correct: 0,
-      explain: "Week 2 narrative step 1 for the hotel page example: \"git checkout -b add-hotel-landing-page\"."
-    },
-    {
-      id: 12, week: "Week 2", type: "mc",
-      question: "Which authentication method does the course recommend for connecting to GitHub in this class?",
-      options: ["HTTPS", "SSH keys, required", "FTP", "Telnet"],
-      correct: 0,
-      explain: "week-2-connecting-to-github.md says: \"For this class, HTTPS is fine.\""
-    },
-    {
-      id: 13, week: "Week 2", type: "tf",
-      question: "The course materials say it's fine to commit your changes directly onto the main branch.",
-      correct: false,
-      explain: "Week 2 narrative says to create a new branch (\"avoid committing to the main branch\"), since a branch keeps changes off main and mirrors a real-world PR workflow."
-    },
-    {
-      id: 14, week: "Week 2", type: "mc",
-      question: "When creating a new GitHub repo, what does checking \"Add a README file\" do?",
-      options: [
-        "Creates the initial commit and maps the repo to the main branch",
-        "Deletes the repo",
-        "Makes the repo private",
-        "Nothing, it's just decoration"
-      ],
-      correct: 0,
-      explain: "Week 2 narrative: \"This is important because creating the README creates an initial commit that maps the repo to the main branch.\""
-    },
-    {
-      id: 15, week: "Week 3", type: "mc",
-      question: "Put Claude's four model tiers in order from largest/most capable to smallest.",
-      options: [
-        "Fable, Opus, Sonnet, Haiku",
-        "Haiku, Sonnet, Opus, Fable",
-        "Sonnet, Fable, Haiku, Opus",
-        "Opus, Fable, Sonnet, Haiku"
-      ],
-      correct: 0,
-      explain: "Week 3 narrative: \"Four model tiers, largest to smallest: Fable, Opus, Sonnet, Haiku.\""
-    },
-    {
-      id: 16, week: "Week 3", type: "mc",
-      question: "Which Claude tier is described as \"the cost effective everyday workhorse\"?",
-      options: ["Sonnet", "Fable", "Opus", "Haiku"],
-      correct: 0,
-      explain: "Week 3 narrative: \"Sonnet is the cost effective everyday workhorse.\""
-    },
-    {
-      id: 17, week: "Week 3", type: "tf",
-      question: "A \"token\" and a \"parameter\" mean the same thing in AI.",
-      correct: false,
-      explain: "They're different. Parameters are the numbers inside a model that get tuned during training. Tokens are chunks of text, roughly 3/4 of an English word."
-    },
-    {
-      id: 18, week: "Week 3", type: "mc",
-      question: "What is a \"harness,\" as described in Week 3?",
-      options: [
-        "The program you use to interact with an AI model",
-        "The AI model itself",
-        "A type of computer chip",
-        "A GitHub branch"
-      ],
-      correct: 0,
-      explain: "Week 3 narrative: \"A harness is the program you use to interact with an AI model. The model is the AI behind the harness... The harness is the music player, the model is the music.\""
-    },
-    {
-      id: 19, week: "Week 3", type: "tf",
-      question: "MindRouter can be reached from anywhere, with no VPN needed.",
-      correct: false,
-      explain: "The setup guide says: \"MindRouter is only reachable from the campus network. If you are off campus, start the U of I VPN.\""
-    },
-    {
-      id: 20, week: "Week 3", type: "mc",
-      question: "According to Week 3, how should you pick which AI model to use for a job?",
-      options: [
-        "By result, speed, and price, not by parameter count",
-        "Always pick the biggest model",
-        "Always pick the cheapest model, regardless of quality",
-        "By whichever model has the most parameters"
-      ],
-      correct: 0,
-      explain: "Week 3 narrative: \"You do not pick models by parameter count, you pick by result, speed, and price.\""
-    }
+  // ---- Term / definition pairs, grouped by week (drawn only from the Week 1-3 course files) ----
+  var ALL_PAIRS = [
+    { id: 1, week: "Week 1", term: "Ryan Carlyle", def: "The instructor of BUS 4040 (call him Ryan or Carlyle)" },
+    { id: 2, week: "Week 1", term: "GitHub Setup", def: "The grading component worth 5%: GitHub connectivity and a successful pull request" },
+    { id: 3, week: "Week 1", term: "Peer Review", def: "The grading component worth 15%: structured feedback from your teammates" },
+    { id: 4, week: "Week 1", term: "Final Exam", def: "The grading component worth 10%: a written exam, with nothing on it that wasn't discussed in class" },
+    { id: 5, week: "Week 1", term: "One credit, sixteen weeks", def: "How long and how many credits BUS 4040 is" },
+
+    { id: 6, week: "Week 2", term: "Linus Torvalds", def: "Created Git in 2005 for Linux kernel development" },
+    { id: 7, week: "Week 2", term: "Git", def: "A free, fast, decentralized system where every developer holds a full copy of the project's history" },
+    { id: 8, week: "Week 2", term: "git checkout -b", def: "The command that creates and switches to a new branch" },
+    { id: 9, week: "Week 2", term: "git push -u origin branch-name", def: "The command that pushes a branch to GitHub and sets it to track there" },
+    { id: 10, week: "Week 2", term: "Add a README file", def: "The checkbox that creates the first commit and the main branch when you make a new repo" },
+
+    { id: 11, week: "Week 3", term: "Fable, Opus, Sonnet, Haiku", def: "Claude's four model tiers, from largest to smallest" },
+    { id: 12, week: "Week 3", term: "Sonnet", def: "The Claude tier described as the cost-effective everyday workhorse" },
+    { id: 13, week: "Week 3", term: "Token", def: "A chunk of text, roughly 3/4 of an English word, that AI reads and is billed by" },
+    { id: 14, week: "Week 3", term: "Harness", def: "The program you use to interact with an AI model, like the Claude app or VS Code" },
+    { id: 15, week: "Week 3", term: "MindRouter", def: "The U of I AI tool that only works when you're connected to the campus VPN" }
   ];
+
+  var ROUNDS = chunk(ALL_PAIRS, 5);
 
   // ---- State ----
   var app = document.getElementById("app");
-  var currentSet = [];
-  var index = 0;
-  var score = 0;
-  var missedIds = [];
+  var timerRow = document.getElementById("timerRow");
+  var timerValue = document.getElementById("timerValue");
+
+  var timerInterval = null;
+  var startTs = null;
+
+  var currentRoundIndex = 0;      // index into ROUNDS, for the normal (non-redo) pass
+  var missedIdsAllTime = [];      // ids that have ever been dropped incorrectly and aren't yet redone correctly
+
+  // per-round working state
+  var roundPairs = [];
+  var roundIsRedo = false;
+  var roundMatchedCount = 0;
+  var roundMissedThisAttempt = []; // ids missed at least once during the current round/redo attempt
+  var feedbackTimeout = null;
 
   function shuffle(arr) {
     var a = arr.slice();
@@ -390,144 +326,352 @@
     return a;
   }
 
-  function startQuiz(questionList) {
-    currentSet = shuffle(questionList);
-    index = 0;
-    score = 0;
-    missedIds = [];
-    renderQuestion();
-  }
-
-  function getOptionsForQuestion(q) {
-    if (q.type === "tf") {
-      return ["True", "False"];
+  function chunk(arr, size) {
+    var out = [];
+    for (var i = 0; i < arr.length; i += size) {
+      out.push(arr.slice(i, i + size));
     }
-    return q.options;
+    return out;
   }
 
-  function isChoiceCorrect(q, choiceIndex) {
-    if (q.type === "tf") {
-      var chosenBool = (choiceIndex === 0); // 0 = "True", 1 = "False"
-      return chosenBool === q.correct;
+  function formatTime(totalSeconds) {
+    var m = Math.floor(totalSeconds / 60);
+    var s = totalSeconds % 60;
+    return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+  }
+
+  function startTimer() {
+    startTs = Date.now();
+    timerRow.style.display = "flex";
+    timerValue.textContent = "00:00";
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(function () {
+      var elapsed = Math.floor((Date.now() - startTs) / 1000);
+      timerValue.textContent = formatTime(elapsed);
+    }, 250);
+  }
+
+  function stopTimer() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
     }
-    return choiceIndex === q.correct;
   }
 
-  function renderQuestion() {
-    var q = currentSet[index];
-    var total = currentSet.length;
-    var options = getOptionsForQuestion(q);
+  function getElapsedSeconds() {
+    return startTs ? Math.floor((Date.now() - startTs) / 1000) : 0;
+  }
+
+  function addMissed(id) {
+    if (missedIdsAllTime.indexOf(id) === -1) missedIdsAllTime.push(id);
+    if (roundMissedThisAttempt.indexOf(id) === -1) roundMissedThisAttempt.push(id);
+  }
+
+  function removeMissed(id) {
+    var i = missedIdsAllTime.indexOf(id);
+    if (i !== -1) missedIdsAllTime.splice(i, 1);
+  }
+
+  // ---- Quiz flow ----
+
+  function startQuiz() {
+    currentRoundIndex = 0;
+    missedIdsAllTime = [];
+    startTimer();
+    loadRound(ROUNDS[0], false);
+  }
+
+  function loadRound(pairs, isRedo) {
+    roundPairs = pairs;
+    roundIsRedo = isRedo;
+    roundMatchedCount = 0;
+    roundMissedThisAttempt = [];
+    renderRound();
+  }
+
+  function renderRound() {
+    var terms = shuffle(roundPairs);
+    var defs = shuffle(roundPairs);
+
+    var heading, progressLabel, weekLabel;
+    if (roundIsRedo) {
+      heading = "Redo the terms you missed";
+      progressLabel = roundPairs.length + " term" + (roundPairs.length === 1 ? "" : "s") + " to re-match";
+      weekLabel = null; // redo rounds can mix weeks
+    } else {
+      heading = "Round " + (currentRoundIndex + 1) + " of " + ROUNDS.length;
+      progressLabel = roundPairs[0].week + " terms";
+      weekLabel = roundPairs[0].week;
+    }
 
     var html = "";
-    html += '<div class="progress-row"><span>Question ' + (index + 1) + ' of ' + total + '</span><span>Score so far: ' + score + '</span></div>';
-    html += '<div class="progress-bar"><div class="progress-fill" style="width:' + Math.round((index / total) * 100) + '%"></div></div>';
-    html += '<div class="week-tag">' + q.week + '</div>';
-    html += '<p class="question-text">' + q.question + '</p>';
-    html += '<div class="options" id="options"></div>';
-    html += '<div id="feedbackArea"></div>';
+    if (weekLabel) html += '<div class="week-tag">' + weekLabel + '</div>';
+    html += '<h2 class="round-heading">' + heading + '</h2>';
+    html += '<div class="round-progress" id="roundProgress">Matched 0 of ' + roundPairs.length + ' &middot; ' + progressLabel + '</div>';
+    html += '<p class="instructions">Drag a term on the left and drop it onto its matching definition on the right.</p>';
+    html += '<div class="feedback-banner" id="feedbackBanner"></div>';
+    html += '<div class="match-grid">';
+    html += '<div><div class="col-heading">Terms</div><div class="term-list" id="termList"></div></div>';
+    html += '<div><div class="col-heading">Definitions</div><div class="def-list" id="defList"></div></div>';
+    html += '</div>';
 
     app.innerHTML = html;
 
-    var optionsDiv = document.getElementById("options");
-    options.forEach(function (optText, i) {
-      var btn = document.createElement("button");
-      btn.className = "option-btn";
-      btn.type = "button";
-      btn.textContent = optText;
-      btn.addEventListener("click", function () {
-        handleAnswer(q, i, optionsDiv);
-      });
-      optionsDiv.appendChild(btn);
+    var termList = document.getElementById("termList");
+    var defList = document.getElementById("defList");
+
+    terms.forEach(function (pair) {
+      var card = document.createElement("div");
+      card.className = "term-card";
+      card.dataset.id = pair.id;
+      card.textContent = pair.term;
+      attachDragHandlers(card, pair);
+      termList.appendChild(card);
+    });
+
+    defs.forEach(function (pair) {
+      var zone = document.createElement("div");
+      zone.className = "drop-zone";
+      zone.dataset.id = pair.id;
+
+      var defText = document.createElement("div");
+      defText.className = "def-text";
+      defText.textContent = pair.def;
+
+      var slot = document.createElement("div");
+      slot.className = "slot";
+      slot.textContent = "Drop the matching term here";
+
+      zone.appendChild(defText);
+      zone.appendChild(slot);
+      defList.appendChild(zone);
     });
   }
 
-  function handleAnswer(q, choiceIndex, optionsDiv) {
-    var buttons = optionsDiv.querySelectorAll(".option-btn");
-    var correctIndex = q.type === "tf" ? (q.correct ? 0 : 1) : q.correct;
-    var wasRight = isChoiceCorrect(q, choiceIndex);
+  function showFeedback(isCorrect, message) {
+    var banner = document.getElementById("feedbackBanner");
+    if (!banner) return;
+    banner.className = "feedback-banner show " + (isCorrect ? "right" : "wrong");
+    banner.textContent = message;
+    if (feedbackTimeout) clearTimeout(feedbackTimeout);
+    feedbackTimeout = setTimeout(function () {
+      banner.classList.remove("show");
+    }, 1400);
+  }
 
-    buttons.forEach(function (btn, i) {
-      btn.disabled = true;
-      if (i === correctIndex) {
-        btn.classList.add("correct");
-      } else if (i === choiceIndex && !wasRight) {
-        btn.classList.add("incorrect");
+  function updateProgress() {
+    var el = document.getElementById("roundProgress");
+    if (!el) return;
+    var text = el.textContent;
+    var suffix = text.indexOf("·") !== -1 ? text.slice(text.indexOf("·")) : "";
+    el.textContent = "Matched " + roundMatchedCount + " of " + roundPairs.length + " " + suffix;
+  }
+
+  function attachDragHandlers(card, pair) {
+    card.addEventListener("pointerdown", function (e) {
+      if (e.button !== undefined && e.button !== 0) return; // left click / primary touch only
+      e.preventDefault();
+
+      var rect = card.getBoundingClientRect();
+      var offsetX = e.clientX - rect.left;
+      var offsetY = e.clientY - rect.top;
+
+      var placeholder = document.createElement("div");
+      placeholder.className = "term-placeholder";
+      placeholder.style.height = rect.height + "px";
+      card.parentNode.insertBefore(placeholder, card);
+
+      card.style.left = rect.left + "px";
+      card.style.top = rect.top + "px";
+      card.style.width = rect.width + "px";
+      card.classList.add("dragging");
+
+      try { card.setPointerCapture(e.pointerId); } catch (err) {}
+
+      var lastHoverZone = null;
+
+      function clearHover() {
+        if (lastHoverZone) {
+          lastHoverZone.classList.remove("drag-hover");
+          lastHoverZone = null;
+        }
       }
-    });
 
-    if (wasRight) {
-      score++;
+      function findDropZone(x, y) {
+        var el = document.elementFromPoint(x, y);
+        return el ? el.closest(".drop-zone") : null;
+      }
+
+      function onMove(ev) {
+        card.style.left = (ev.clientX - offsetX) + "px";
+        card.style.top = (ev.clientY - offsetY) + "px";
+
+        var zone = findDropZone(ev.clientX, ev.clientY);
+        if (zone !== lastHoverZone) {
+          clearHover();
+          if (zone && !zone.classList.contains("filled")) {
+            zone.classList.add("drag-hover");
+            lastHoverZone = zone;
+          }
+        }
+      }
+
+      function onUp(ev) {
+        card.removeEventListener("pointermove", onMove);
+        card.removeEventListener("pointerup", onUp);
+        card.removeEventListener("pointercancel", onUp);
+        try { card.releasePointerCapture(ev.pointerId); } catch (err) {}
+        clearHover();
+
+        var zone = findDropZone(ev.clientX, ev.clientY);
+
+        if (zone && !zone.classList.contains("filled")) {
+          var correct = String(zone.dataset.id) === String(pair.id);
+          if (correct) {
+            placeholder.remove();
+            card.classList.remove("dragging");
+            card.style.position = "";
+            card.style.left = "";
+            card.style.top = "";
+            card.style.width = "";
+
+            var slot = zone.querySelector(".slot");
+            slot.textContent = pair.term;
+            zone.classList.add("filled");
+            card.remove();
+
+            roundMatchedCount++;
+            updateProgress();
+
+            // A term that is now matched correctly during a redo attempt,
+            // with no mistakes yet this attempt, is considered learned.
+            if (roundIsRedo && roundMissedThisAttempt.indexOf(pair.id) === -1) {
+              removeMissed(pair.id);
+            }
+
+            showFeedback(true, "Correct: \"" + pair.term + "\" matches that definition.");
+
+            if (roundMatchedCount === roundPairs.length) {
+              setTimeout(onRoundComplete, 700);
+            }
+          } else {
+            zone.classList.add("wrong-flash");
+            setTimeout(function () { zone.classList.remove("wrong-flash"); }, 500);
+            addMissed(pair.id);
+            showFeedback(false, "Not a match. Try \"" + pair.term + "\" on a different definition.");
+            resetCardPosition(card, placeholder);
+          }
+        } else {
+          resetCardPosition(card, placeholder);
+        }
+      }
+
+      card.addEventListener("pointermove", onMove);
+      card.addEventListener("pointerup", onUp);
+      card.addEventListener("pointercancel", onUp);
+    });
+  }
+
+  function resetCardPosition(card, placeholder) {
+    card.classList.remove("dragging");
+    card.style.position = "";
+    card.style.left = "";
+    card.style.top = "";
+    card.style.width = "";
+    placeholder.remove();
+  }
+
+  function onRoundComplete() {
+    if (roundIsRedo) {
+      renderRedoRoundComplete();
+    } else if (currentRoundIndex < ROUNDS.length - 1) {
+      renderRoundInterstitial();
     } else {
-      missedIds.push(q.id);
+      if (missedIdsAllTime.length === 0) stopTimer();
+      renderFinalResults();
     }
+  }
 
-    var feedbackArea = document.getElementById("feedbackArea");
-    var feedbackHtml = '<div class="feedback ' + (wasRight ? "right" : "wrong") + '">';
-    feedbackHtml += '<strong>' + (wasRight ? "Correct." : "Not quite.") + '</strong>';
-    feedbackHtml += q.explain;
-    feedbackHtml += '</div>';
-    feedbackHtml += '<button class="next-btn" id="nextBtn">' + (index === currentSet.length - 1 ? "See my results" : "Next question") + '</button>';
-    feedbackArea.innerHTML = feedbackHtml;
+  function renderRoundInterstitial() {
+    var missedCount = roundMissedThisAttempt.length;
+    var html = "";
+    html += '<div class="week-tag">' + roundPairs[0].week + '</div>';
+    html += '<h2 class="round-heading">Round ' + (currentRoundIndex + 1) + ' complete</h2>';
+    if (missedCount === 0) {
+      html += '<p class="score-sub">You matched all ' + roundPairs.length + ' terms on the first try.</p>';
+    } else {
+      html += '<p class="score-sub">You matched all ' + roundPairs.length + ' terms. ' + missedCount + ' of them took more than one try, so they will show up for you to redo at the end.</p>';
+    }
+    html += '<button class="primary-btn" id="continueBtn">Continue to Round ' + (currentRoundIndex + 2) + '</button>';
+    app.innerHTML = html;
 
-    document.getElementById("nextBtn").addEventListener("click", function () {
-      index++;
-      if (index < currentSet.length) {
-        renderQuestion();
-      } else {
-        renderResults();
-      }
+    document.getElementById("continueBtn").addEventListener("click", function () {
+      currentRoundIndex++;
+      loadRound(ROUNDS[currentRoundIndex], false);
     });
   }
 
-  function renderResults() {
-    var total = currentSet.length;
-    var html = "";
-    html += '<div class="score-big">' + score + ' / ' + total + '</div>';
-
-    if (missedIds.length === 0) {
-      html += '<div class="score-sub">You got every question right. Nice work.</div>';
-      html += '<button class="primary-btn" id="restartBtn">Start a new full quiz (20 questions)</button>';
+  function renderRedoRoundComplete() {
+    if (missedIdsAllTime.length === 0) {
+      stopTimer();
+      renderAllCaughtUp();
     } else {
-      html += '<div class="score-sub">You missed ' + missedIds.length + ' question' + (missedIds.length === 1 ? "" : "s") + '. Here is what to review:</div>';
+      renderFinalResults();
+    }
+  }
+
+  function renderAllCaughtUp() {
+    var html = "";
+    html += '<div class="score-big">' + formatTime(getElapsedSeconds()) + '</div>';
+    html += '<div class="score-sub">Total time. You have now matched every term correctly, including your redo round.</div>';
+    html += '<button class="primary-btn" id="restartBtn">Start over (new shuffle)</button>';
+    app.innerHTML = html;
+    document.getElementById("restartBtn").addEventListener("click", startQuiz);
+  }
+
+  function renderFinalResults() {
+    var totalTerms = ALL_PAIRS.length;
+    var cleanCount = totalTerms - missedIdsAllTime.length;
+
+    var html = "";
+    html += '<div class="score-big">' + formatTime(getElapsedSeconds()) + '</div>';
+
+    if (missedIdsAllTime.length === 0) {
+      html += '<div class="score-sub">Total time to match all ' + totalTerms + ' terms, all on the first try. Nice work.</div>';
+      html += '<button class="primary-btn" id="restartBtn">Start over (new shuffle)</button>';
+    } else {
+      html += '<div class="score-sub">Total time so far. You matched ' + cleanCount + ' of ' + totalTerms + ' terms on the first try. ' +
+        missedIdsAllTime.length + ' term' + (missedIdsAllTime.length === 1 ? "" : "s") + ' need' + (missedIdsAllTime.length === 1 ? "s" : "") + ' another look:</div>';
       html += '<ul class="missed-list">';
-      missedIds.forEach(function (id) {
-        var q = QUESTIONS.filter(function (item) { return item.id === id; })[0];
-        html += '<li><span class="missed-week">' + q.week + '</span>' + q.question + '</li>';
+      missedIdsAllTime.forEach(function (id) {
+        var pair = ALL_PAIRS.filter(function (p) { return p.id === id; })[0];
+        html += '<li><span class="missed-term">' + pair.term + '</span><span class="missed-week">' + pair.week + '</span><br>' + pair.def + '</li>';
       });
       html += '</ul>';
       html += '<div class="btn-row">';
-      html += '<button class="primary-btn" id="retryBtn">Retry just the ones I missed</button>';
-      html += '<button class="secondary-btn" id="restartBtn">Start a new full quiz (20 questions)</button>';
+      html += '<button class="primary-btn" id="redoBtn">Redo the terms I missed</button>';
+      html += '<button class="secondary-btn" id="restartBtn">Start over (new shuffle)</button>';
       html += '</div>';
     }
 
     app.innerHTML = html;
 
-    var restartBtn = document.getElementById("restartBtn");
-    if (restartBtn) {
-      restartBtn.addEventListener("click", function () {
-        startQuiz(QUESTIONS);
+    var redoBtn = document.getElementById("redoBtn");
+    if (redoBtn) {
+      redoBtn.addEventListener("click", function () {
+        var pairsToRedo = ALL_PAIRS.filter(function (p) { return missedIdsAllTime.indexOf(p.id) !== -1; });
+        loadRound(pairsToRedo, true);
       });
     }
-    var retryBtn = document.getElementById("retryBtn");
-    if (retryBtn) {
-      retryBtn.addEventListener("click", function () {
-        var missedQuestions = QUESTIONS.filter(function (q) {
-          return missedIds.indexOf(q.id) !== -1;
-        });
-        startQuiz(missedQuestions);
-      });
-    }
+    document.getElementById("restartBtn").addEventListener("click", startQuiz);
   }
 
   function renderStart() {
     var html = "";
-    html += '<p class="start-note">20 questions covering Weeks 1-3: course setup and grading, Git and GitHub basics, and AI models and tools. Questions are shuffled every time you start. You will find out right away whether you got each one right, with a short explanation and which week it comes from. At the end you can retry just the questions you missed.</p>';
+    html += '<p class="instructions">This is a drag-and-drop matching quiz built from the Week 1-3 course material: 15 terms across 3 rounds of 5 (course setup and grading, Git and GitHub basics, and AI models and tools). Drag each term onto its matching definition. You will find out right away whether a match is correct. A timer tracks your total time, and at the end you can redo just the terms you missed until you get them all.</p>';
     html += '<button class="primary-btn" id="startBtn">Start the quiz</button>';
     app.innerHTML = html;
-    document.getElementById("startBtn").addEventListener("click", function () {
-      startQuiz(QUESTIONS);
-    });
+    document.getElementById("startBtn").addEventListener("click", startQuiz);
   }
 
   renderStart();
